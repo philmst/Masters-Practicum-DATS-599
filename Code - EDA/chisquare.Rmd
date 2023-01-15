@@ -1,0 +1,79 @@
+---
+title: "chisquare "
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+if(!require("pacman")) install.packages("pacman")
+pacman::p_load(tidyverse, dplyr, ggplot2, ggthemes, data.table, lubridate, MASS, car)
+```
+
+##A
+```{r}
+df <- fread("df")
+```
+
+```{r}
+df <- df %>% dplyr::select (ORIGYEAR, LICNSTAT, PRACTAGE, LICNFELD, ALEGATN1, OUTCOME, TOTALPMT, TOTALPMT_ADJ, PMT)
+```
+
+```{r}
+df$PRACTAGE <- as.factor(df$PRACTAGE)
+df$LICNFELD <- as.factor(df$LICNFELD)
+df$ALEGATN1 <- as.factor(df$ALEGATN1)
+df$OUTCOME <- as.factor(df$OUTCOME)
+df$PMT <- as.factor(df$PMT)
+```
+
+## LICNSTAT Chi-Square
+```{r}
+# Create a table with the needed variables.
+licnstat.data = table(df$LICNSTAT, df$PMT) 
+print(licnstat.data)
+
+# Perform the Chi-Square test.
+print(chisq.test(licnstat.data))
+```
+
+## PRACTAGE Chi-Square
+```{r}
+# Create a table with the needed variables.
+practage.data = table(df$PRACTAGE, df$PMT) 
+#print(practage.data)
+
+# Perform the Chi-Square test.
+print(chisq.test(practage.data))
+```
+
+## LICNFELD Chi-Square
+
+```{r}
+# Create a table with the needed variables.
+licnfeld.data = table(df$LICNFELD, df$PMT) 
+print(licnfeld.data)
+
+# Perform the Chi-Square test.
+print(chisq.test(licnfeld.data))
+```
+
+## ALEGATN1 Chi-Square
+```{r}
+# Create a table with the needed variables.
+alegatn1.data = table(df$ALEGATN1, df$PMT) 
+print(alegatn1.data)
+
+# Perform the Chi-Square test.
+print(chisq.test(alegatn1.data))
+```
+
+## OUTCOME Chi-Square
+```{r}
+# Create a table with the needed variables.
+outcome.data = table(df$OUTCOME, df$PMT) 
+print(outcome.data)
+
+# Perform the Chi-Square test.
+print(chisq.test(outcome.data))
+```

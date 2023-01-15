@@ -1,0 +1,130 @@
+---
+title: "Feature Selection "
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+if(!require("pacman")) install.packages("pacman")
+pacman::p_load(tidyverse, dplyr, ggplot2, ggthemes, data.table, lubridate, leaps,
+               GGally, RColorBrewer, ggsci, plotROC, usmap, gridExtra, sandwich,
+               plotly, ggpubr, vistime, glmnet, mltools, car)
+```
+
+## R Markdown
+
+Read in
+```{r}
+df <- fread("df")
+```
+
+```{r}
+#df <- df %>% select (ORIGYEAR, LICNSTAT, PRACTAGE, Label_LICNFELD, Label_ALEGATN1, Label_OUTCOME, TOTALPMT, TOTALPMT_ADJ, PMT)
+
+df <- df %>% dplyr::select(ORIGYEAR, LICNSTAT, PRACTAGE, LICNFELD, ALEGATN1, OUTCOME, TOTALPMT, TOTALPMT_ADJ, PMT)
+```
+
+```{r}
+#df <- rename(df, LICNFELD = Label_LICNFELD, ALEGATN1 = Label_ALEGATN1, OUTCOME = Label_OUTCOME)
+
+df$PRACTAGE <- as.factor(df$PRACTAGE)
+df$LICNFELD <- as.factor(df$LICNFELD)
+df$ALEGATN1 <- as.factor(df$ALEGATN1)
+df$OUTCOME <- as.factor(df$OUTCOME)
+```
+
+```{r}
+#df <- rename(df, LICNFELD = Label_LICNFELD, ALEGATN1 = Label_ALEGATN1, OUTCOME = Label_OUTCOME)
+
+df$LOG_TOTALPMT_ADJ <- log(df$TOTALPMT_ADJ)
+```
+
+## FIT
+
+```{r}
+model1<-lm(TOTALPMT_ADJ ~ LICNSTAT + PRACTAGE + LICNFELD + ALEGATN1 + OUTCOME, data = df)
+```
+
+```{r}
+model1_log<-lm(LOG_TOTALPMT_ADJ ~ LICNSTAT + PRACTAGE + LICNFELD + ALEGATN1 + OUTCOME, data = df)
+```
+
+```{r}
+summary(model1)
+```
+
+## LICNSTAT FTEST
+
+```{r}
+model2 <- lm(TOTALPMT_ADJ ~ PRACTAGE + LICNFELD + ALEGATN1 + OUTCOME, data = df)
+```
+
+```{r}
+model2_log <- lm(LOG_TOTALPMT_ADJ ~ PRACTAGE + LICNFELD + ALEGATN1 + OUTCOME, data = df)
+```
+
+```{r}
+summary(model2)
+```
+
+```{r}
+anova(model2, model1)
+```
+```{r}
+anova(model2_log, model1_log)
+```
+
+## PRACTAGE FTEST
+
+```{r}
+df1 <- df %>% filter(!is.na(PRACTAGE))
+```
+
+```{r}
+model1b <- lm(TOTALPMT_ADJ ~ LICNSTAT + PRACTAGE + LICNFELD + ALEGATN1 + OUTCOME, data = df1)
+model3<-lm(TOTALPMT_ADJ ~ LICNSTAT + LICNFELD + ALEGATN1 + OUTCOME, data = df1)
+```
+
+```{r}
+#summary(model3)
+anova(model3, model1b)
+```
+
+## LICNFELD FTEST
+
+```{r}
+model4<-lm(TOTALPMT_ADJ ~ LICNSTAT + PRACTAGE + ALEGATN1 + OUTCOME, data = df)
+```
+
+```{r}
+anova(model4, model1)
+```
+
+## ALEGATN1 FTEST
+
+```{r}
+model5<-lm(TOTALPMT_ADJ ~ LICNSTAT + PRACTAGE + LICNFELD + OUTCOME, data = df)
+```
+
+```{r}
+anova(model5, model1)
+```
+
+## OUTCOME FTEST
+
+```{r}
+#df1 <- df %>% filter(!is.na(PRACTAGE))
+```
+
+```{r}
+model6<-lm(TOTALPMT_ADJ ~ LICNSTAT + PRACTAGE + LICNFELD + ALEGATN1, data = df)
+```
+
+```{r}
+anova(model6, model1)
+```
+
+```{r}
+Anova(model1)
+```
